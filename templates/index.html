@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Emotion Sensitive Web</title>
+        <style>
+            body {
+                transition: background-color 0.5s ease;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Emotion Sensitive Web</h1>
+        <form id="upload-form" action="/predict" method="post" enctype="multipart/form-data">
+            <input type="file" name="file" accept="image/*" required>
+            <button type="submit">Upload</button>
+        </form>
+        <div id="result"></div>
+
+        <script>
+            const emotionColors = {
+                'angry': '#ff0000',
+                'disgust': '#008000',
+                'fear': '#800080',
+                'happy': '#ffff00',
+                'neutral': '#808080',
+                'sad': '#0000ff',
+                'surprise': '#ffa500'
+            };
+
+            document.getElementById('upload-form').onsubmit = async function(event) {
+                event.preventDefault();
+
+                const formData = new FormData(event.target);
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                const emotion = result.prediction;
+                document.getElementById('result').textContent = `Prediction: ${emotion}`;
+
+                if (emotion in emotionColors) {
+                    document.body.style.backgroundColor = emotionColors[emotion];
+                } else {
+                    document.body.style.backgroundColor = '#ffffff';
+                }
+            };
+        </script>
+    </body>
+</html>
